@@ -1,0 +1,97 @@
+//  main.cpp
+//  20240920
+//  Created by 신예준 on 2024/09/20.
+
+#include <iostream>
+#include <string>
+using namespace std;
+
+vector<int> scores;
+
+void printMessage() {
+    cout << "1. Show ranking & mean of scores" << "\n";
+    cout << "2. Add scores" << "\n";
+    cout << "3. Delete a score" << "\n";
+    cout << "4. Exit" << "\n";
+    cout << "\n";
+    cout << "choice: ";
+}
+
+void showranking() {
+    vector<int> ranking = scores;
+    int sum=0;
+    for (int i = 0; i < ranking.size()-1; i++) {
+        int maxI = i;
+        for (int j = i+1; j < ranking.size(); j++) {
+            if (ranking[j] > ranking[maxI]) {
+                maxI = j;
+            }
+        }
+        if (maxI != i) {
+            swap(ranking[i], ranking[maxI]);
+        }
+    }
+    cout << "Score board" << "\n";
+    cout << "===========" << "\n";
+    for(int j=1;j<ranking.size()+1;j++){
+        sum+=ranking[j-1];
+        cout << j << "      " << ranking[j-1] << "\n";
+    }
+    cout << "===========" << "\n";
+    cout << "Score mean : " << sum/(ranking.size()) << "\n";
+}
+
+void addscores(){
+    int input;
+    
+    while (true) {
+        cout << "Enter score (0..100) (otherwise exit)" << "\n";
+        cout << "score: ";
+        cin >> input;
+        if (input < 0 || input > 100) {
+            break;
+        }
+        scores.push_back(input);
+        cout << "[";
+        for (int i=0;i<scores.size();i++) {
+            cout << scores[i];
+            if(i!=scores.size()-1){
+                cout << ", ";
+            }
+        }
+        cout << "]" << "\n";
+    }
+}
+
+void deletescore(){
+    int del;
+    cout << "Enter a score to delete : ";
+    cin >> del;
+    
+    for (int i=0;i<scores.size();i++) {
+        if(del==scores[i]){
+            scores.erase(scores.begin()+i);
+            break;
+        }
+    }
+}
+
+int main() {
+    int i=0;
+    while(1){
+        printMessage();
+        cin >> i;
+        if(i==1){
+            showranking();
+        }
+        if(i==2){
+            addscores();
+        }
+        if(i==3){
+            deletescore();
+        }
+        if(i==4){
+            return 0;
+        }
+    }
+}
