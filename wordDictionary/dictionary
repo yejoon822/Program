@@ -1,0 +1,82 @@
+//2024/10/3
+
+#include <iostream>
+#include <algorithm>
+#include <vector>
+
+using namespace std;
+
+vector<pair<string, string>> dict;
+
+void printMessage(){
+    cout << "*************************" << "\n";
+    cout << "*       Dictionary      *" << "\n";
+    cout << "*************************" << "\n";
+    cout << "     1. Save words       " << "\n";
+    cout << "     2. Delete words     " << "\n";
+    cout << "     3. Print all words  " << "\n";
+    cout << "     4. Search word      " << "\n";
+    cout << "     5. Word Test        " << "\n";
+    cout << "     6. Show Test score  " << "\n";
+    cout << "     7. Exit             " << "\n";
+    cout << "=========================" << "\n";
+    cout << "Select >> ";
+}
+
+void savewords(){
+    cout << "Enter word to save. Press 'Enter' to finish" << "\n";
+    cin.ignore();
+    while(1){
+        string str, mean;
+        cout << "Word: ";
+        getline(cin, str);
+        if(str.empty()){
+            break;
+        }
+        bool exist = false;
+        
+        for (int i=0;i<dict.size();i++) {
+            if (dict[i].first == str) {
+                cout << "Already exist\n";
+                exist = true;
+                break;
+            }
+        }
+        if (exist) continue;
+
+        cout << "Mean: ";
+        getline(cin, mean);
+        dict.push_back({str, mean});
+    }
+}
+
+int main() {
+    int i=0;
+    while(1){
+        printMessage();
+        cin >> i;
+        if(i==1){
+            savewords();
+        }
+        if(i==2){
+            
+        }
+        if(i==3){
+            
+        }
+        if(i==4){
+            
+        }
+        if(i==5){
+            
+        }
+        if(i==6){
+            
+        }
+        if(i==7){
+            
+        }
+    }
+    return 0;
+}
+
