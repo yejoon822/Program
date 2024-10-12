@@ -7,6 +7,7 @@
 using namespace std;
 
 vector<pair<string, string>> dict;
+vector<int> ranking;
 string str, mean;
 
 void printMessage(){
@@ -79,7 +80,7 @@ void printall(){
 
 void searchword(){
     cout << "Enter word to search" << "\n";
-    cout << "Word: " << "\n";
+    cout << "Word: ";
     cin.ignore();
     getline(cin, str);
     for (int i=0;i<dict.size();i++) {
@@ -87,6 +88,45 @@ void searchword(){
             cout << dict[i].first << "\t" << dict[i].second << "\n";
             break;
         }
+    }
+}
+
+void wordtest(){
+    int sum=0;
+    if(dict.empty()){
+        cout << "Test can't be started, because of no words" << "\n";
+    }
+    else{
+        for(int i=0;i<dict.size();i++){
+            cout << dict[i].first << ":";
+            cin >> str;
+            if(dict[i].second == str){
+                cout << "Correct!" << "\n";
+                sum+=1;
+            }
+            else{
+                cout << "Wrong.." << "\n";
+            }
+        }
+        cout << "You got " << sum << " answers." << "\n";
+        ranking.push_back(sum);
+    }
+}
+
+void testranking(){
+    cout << "    ScoreBoard    " << "\n";
+    cout << "==================" << "\n";
+    sort(ranking.begin(), ranking.end(), greater<int>());
+    int rank=1;
+    int count=0;
+    for (int i = 0; i < ranking.size(); i++) {
+        if (ranking[i] == ranking[i - 1]) {
+            cout << rank << " rank\t " << ranking[i] << " answers\n";
+        }else {
+            rank = count + 1;
+            cout << rank << " rank\t " << ranking[i] << " answers\n";
+        }
+        count++;
     }
 }
 
@@ -108,13 +148,13 @@ int main() {
             searchword();
         }
         if(i==5){
-            
+            wordtest();
         }
         if(i==6){
-            
+            testranking();
         }
         if(i==7){
-            cout << "Thanks for using dictionary";
+            cout << "Thanks for using dictionary" << "\n";
             return 0;
         }
     }
