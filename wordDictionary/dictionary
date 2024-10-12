@@ -1,4 +1,4 @@
-//2024/10/3
+//2024/10/12
 
 #include <iostream>
 #include <algorithm>
@@ -7,6 +7,7 @@
 using namespace std;
 
 vector<pair<string, string>> dict;
+string str, mean;
 
 void printMessage(){
     cout << "*************************" << "\n";
@@ -27,7 +28,6 @@ void savewords(){
     cout << "Enter word to save. Press 'Enter' to finish" << "\n";
     cin.ignore();
     while(1){
-        string str, mean;
         cout << "Word: ";
         getline(cin, str);
         if(str.empty()){
@@ -50,6 +50,27 @@ void savewords(){
     }
 }
 
+void deleted(){
+    cout << "Enter word to delete." << "\n";
+    cin.ignore();
+    while(1){
+        cout << "Word: ";
+        getline(cin, str);
+        if(str.empty()){
+            break;
+        }
+        for(int i=0;i<dict.size();i++){
+            if(dict[i].first == str){
+                dict.erase(dict.begin()+i);
+                cout << "Deletion is completed" << "\n";
+            }
+            else{
+                cout << "No such words" << "\n";
+            }
+        }
+    }
+}
+
 int main() {
     int i=0;
     while(1){
@@ -59,7 +80,7 @@ int main() {
             savewords();
         }
         if(i==2){
-            
+            deleted();
         }
         if(i==3){
             
