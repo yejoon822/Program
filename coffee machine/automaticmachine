@@ -71,7 +71,7 @@ void calculate_price(){
     cin >> paymoney;
     if(price > paymoney){
       cout << "Too small.." << "\n";
-    }else{1
+    }else{
       change = paymoney - price;
       break;
     }
@@ -79,20 +79,19 @@ void calculate_price(){
 }
 
 void get_change(){
-  int fivethousand = 0;
-  int onethousand = 0;
-  int fivehundred = 0;
-  int onehundred = 0;
+  int won[4]={5000, 1000, 500, 100};
+  int cnt[4]={0};
   cout << "Your change is " << change << " won." << "\n";
   cout << "==========================" << "\n";
-  fivethousand=change/5000;
-  onethousand=(change%5000)/1000;
-  fivehundred=((change%5000)%1000)/500;
-  onehundred=(((change%5000)%1000)%500)/100;
-  cout << "5000 won: " << fivethousand << "\n";
-  cout << "1000 won: " << onethousand << "\n";
-  cout << "500 won: " << fivehundred << "\n";
-  cout << "100 won: " << onehundred << "\n";
+  for(int i=0;i<4;i++){
+    int a=change/won[i];
+    cnt[i] = a;
+    change = change%won[i];
+  }
+  cout << "5000 won: " << cnt[0] << "\n";
+  cout << "1000 won: " << cnt[1] << "\n";
+  cout << "500 won: " << cnt[2] << "\n";
+  cout << "100 won: " << cnt[3] << "\n";
   cout << "\n";
   cout << "Thank you for using our machine";
 }
