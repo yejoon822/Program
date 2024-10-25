@@ -1,6 +1,6 @@
 //  main.cpp
 //  20241018
-//  Created by 신예준 on 2024/10/18
+//  Created by 신예준 on 2024/10/18999
 
 #include <iostream>
 #include <algorithm>
@@ -13,8 +13,8 @@ string menus = "Americano, Cafe latte, Cafe Mocha";
 string menu, cupnumber;
 int change=0;
 
-void printMessage(){
-  cout << "\n";
+void printMessage(){ 
+  cout << "\n"; 
   cout << "1. Select coffee menu" << "\n";
   cout << "2. Check your order" << "\n";
   cout << "3. Pay total price" << "\n";
