@@ -1,0 +1,39 @@
+#include <iostream>
+#include <cstdlib>
+#include <ctime>
+
+using namespace std;
+
+int main() {
+    cout << "Game to guess numbers! If you get it right within 5 chances, you win. If you don't, you lose" << endl;
+    cout << "Random number created. (Between 1~100)" << endl;
+    srand((unsigned)time(0));
+    int number = rand() % 100 + 1; // Ensure the number is between 1 and 100
+    int input;
+
+    for (int i = 5; i >= 0; i--) {
+        cout << "Enter your guess: ";
+        cin >> input;
+
+        if (input == number) {
+            cout << "Win!" << endl;
+            break;
+        }
+
+        if (i == 0) {
+            cout << "Lose! The correct number was " << number << "." << endl;
+            break;
+        }
+
+        if (input > number) {
+            cout << "Too high! Try again." << endl;
+        } else {
+            cout << "Too low! Try again." << endl;
+        }
+
+        cout << "Remaining attempts: " << i << endl;
+    }
+
+    return 0;
+}
+
