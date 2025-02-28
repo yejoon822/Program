@@ -17,7 +17,7 @@ int main() {
     srand(time(NULL));
     secretNumber = rand() % 100 + 1; // Random number between 1 and 100
     
-    printf("1부터 100까지의 숫자를 맞춰보세요!\n");
+    printf("Guess number between 1 and 100!\n");
     
     do {
         printf("숫자를 입력하세요: ");
