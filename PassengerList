@@ -1,0 +1,208 @@
+//Titanic Passenger List Program (C)
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_PASSENGERS 1000
+#define MAX_LINE 512
+
+// Define Passenger - typedef
+typedef struct {
+    int id;
+    int pclass;
+    int survived;
+    char name[100];
+    char sex[10];
+    float age;
+    int sibsp;
+    int parch;
+    char ticket[30];
+    float fare;
+    char cabin[20];
+    char embarked[5];
+} Passenger;
+
+Passenger passengers[MAX_PASSENGERS];
+int passenger_count = 0;
+
+// Save CSV line in struct
+void parse_line(char *line, Passenger *p, int id) {
+    char *token;
+
+    p->id = id;  // Set Passenger ID
+
+    token = strtok(line, ",");
+    p->pclass = atoi(token);
+
+    token = strtok(NULL, ",");
+    p->survived = atoi(token);
+
+    token = strtok(NULL, ",");
+    strcpy(p->name, token);
+
+    token = strtok(NULL, ",");
+    strcpy(p->sex, token);
+
+    token = strtok(NULL, ",");
+    p->age = (strlen(token) > 0) ? atof(token) : -1;
+
+    token = strtok(NULL, ",");
+    p->sibsp = atoi(token);
+
+    token = strtok(NULL, ",");
+    p->parch = atoi(token);
+
+    token = strtok(NULL, ",");
+    strcpy(p->ticket, token);
+
+    token = strtok(NULL, ",");
+    p->fare = atof(token);
+
+    token = strtok(NULL, ",");
+    strcpy(p->cabin, (strlen(token) > 0) ? token : "Unknown");
+
+    token = strtok(NULL, ",");
+    strcpy(p->embarked, (strlen(token) > 0) ? token : "Unknown");
+}
+
+// Function that reads CSV file
+void load_csv(const char *filename) {
+    FILE *file = fopen(filename, "r");
+    if (!file) {
+        printf("파일을 열 수 없습니다.\n");
+        return;
+    }
+
+    char line[MAX_LINE];
+    fgets(line, MAX_LINE, file); //Skip first line
+
+    int id = 1;
+    while (fgets(line, MAX_LINE, file) && passenger_count < MAX_PASSENGERS) {
+        parse_line(line, &passengers[passenger_count], id++);
+        passenger_count++;
+    }
+
+    fclose(file);
+    printf("Total of %d passengers' data is brought from the CSV file.\n", passenger_count);
+}
+
+// 모든 승객 출력
+void printAllPassengers() {
+    int displayed = 0;
+    char answer[10];
+
+    while (displayed < passenger_count) {
+        int end = displayed + 10;
+        if (end > passenger_count) end = passenger_count;
+
+        printf("Passenger list:\n");
+        for (int i = displayed; i < end; i++) {
+            printf("ID: [%d], Class: %d, Age: %.1f, Name: '%s', Survived: %s\n",
+                   passengers[i].id,       // Passenger ID (integer)
+                   passengers[i].pclass,   // Passenger Class (integer)
+                   passengers[i].age,      // Age (float)
+                   passengers[i].name,     // Name (string)
+                   passengers[i].survived ? "Yes" : "No"); // Survived (boolean to string)
+        }
+
+
+        displayed = end;
+
+        if (displayed >= passenger_count) {
+            printf("All passengers' information is printed.\n");
+            break;
+        }
+
+        printf("Do you want to see more? (Yes/No): ");
+        scanf("%s", answer);
+
+        if (strcmp(answer, "Yes") != 0) {
+            break;
+        }
+    }
+}
+
+
+// 특정 승객 검색
+void searchPassenger(int id) {
+    for (int i = 0; i < passenger_count; i++) {
+        if (passengers[i].id == id) {
+            printf("ID: %d, Name: %s, Age: %.1f, Sex: %s, Survived: %s\n",
+                   passengers[i].id, passengers[i].name, passengers[i].age,
+                   passengers[i].sex, passengers[i].survived ? "Alive" : "Dead");
+            return;
+        }
+    }
+    printf("Cannot find the passenger.\n");
+}
+
+// 특정 등급 탑승객 검색
+void searchByClass(int class_level) {
+    printf("Class %d passenger:\n", class_level);
+    for (int i = 0; i < passenger_count; i++) {
+        if (passengers[i].pclass == class_level) {
+            printf("[%d] %s (Age: %.1f, Sex: %s, Survived: %s)\n",
+                   passengers[i].id, passengers[i].name, passengers[i].age,
+                   passengers[i].sex, passengers[i].survived ? "Yes" : "No");
+        }
+    }
+}
+
+// 생존자 출력
+void printSurvivors() {
+    printf("Survived passenger list:\n");
+    for (int i = 0; i < passenger_count; i++) {
+        if (passengers[i].survived) {
+            printf("[%d] %s (Age: %.1f, Sex: %s)\n",
+                   passengers[i].id, passengers[i].name, passengers[i].age, passengers[i].sex);
+        }
+    }
+}
+
+// 메인 함수 (메뉴)
+int main() {
+    int choice, id, class_level;
+
+    load_csv("/Users/yejoonshin/Desktop/Program/titanic.csv");  // Bring CSV file, using absolute way
+
+    while (1) {
+        printf("\n===== Titanic Passenger Data =====\n");
+        printf("1. Find every passenger. \n");
+        printf("2. Find specific passenger (Enter ID)\n");
+        printf("3. Find specific class passenger\n");
+        printf("4. Print survived passenger\n");
+        printf("5. End program\n");
+        printf("Select: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printAllPassengers();
+                break;
+            case 2:
+                printf("Enter Passenger ID: ");
+                scanf("%d", &id);
+                searchPassenger(id);
+                break;
+            case 3:
+                printf("Enter Class You Want to Find (1~3): ");
+                scanf("%d", &class_level);
+                searchByClass(class_level);
+                break;
+            case 4:
+                printSurvivors();
+                break;
+            case 5:
+                printf("End Program.\n");
+                return 0;
+            default:
+                printf("Enter Right Number.\n");
+        }
+    }
+
+    return 0;
+
+}
+    
+
+
