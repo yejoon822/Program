@@ -1,0 +1,25 @@
+import re
+from collections import Counter
+
+def clean_and_count(sentence: str):
+    # 1. Lowercase the sentence
+    sentence = sentence.lower()
+    
+    # 2. Remove punctuation using regex
+    sentence = re.sub(r'[^\w\s]', '', sentence)
+
+    # 3. Split into words
+    words = sentence.split()
+
+    # 4. Count using Counter
+    word_counts = Counter(words)
+
+    # 5. Sort by most common
+    sorted_counts = word_counts.most_common()
+
+    return sorted_counts
+
+# Example usage
+text = "Wow! This is fun. This is really, really fun."
+result = clean_and_count(text)
+print(result)
