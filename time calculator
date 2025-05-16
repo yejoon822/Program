@@ -1,0 +1,24 @@
+#python-program choosing which game I can play before my parents arrive (My school ends at 4, so I can start playing at 4.)
+
+h, m = map(int, input("Enter when your parents come to home in hour and minute:").split())
+
+remain = (h-4)*60 + m
+
+a= remain%13
+b= remain%29
+c= remain%25
+
+print(f"You can play {remain-a}minutes of 'AmongUs'")
+print(f"You can play {remain-b}minutes of League of Legends")
+print(f"You can play {remain-c}minutes of Battleground")
+
+if a <= b and a <= c:
+    game= "AmongUs"
+if b <= a and b <= c:
+    game= "League of Legends"
+if c <= a and c <= b:
+    game= "Battleground"
+
+print(f"It is best for you to play {game}")\
+
+
