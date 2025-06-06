@@ -1,0 +1,189 @@
+from tkinter import *
+
+FONT = "Arial {}"
+W = 3
+H = 2
+
+
+class Operator:
+    def __init__(self, input_label: Label, result_label: Label):
+        '''인자:
+        input_label: 입력 라벨
+        result_label: 결과 라벨
+        '''
+        self.input_label = input_label
+        self.result_label = result_label
+
+    def set_input(self, text: str):
+        '입력 라벨의 값을 변경하는 메소드'
+        self.input_label.config(text=text)
+
+    def get_input(self):
+        '입력 라벨의 값을 가져오는 메소드'
+        return self.input_label.cget('text')
+
+    def is_empty(self):
+        return self.get_input() == ""
+
+    def add_text(self, obj):
+        '입력 라벨에 값을 추가해주는 메소드(입력)'
+        text = self.get_input()
+        self.set_input(text+str(obj))
+
+    def del_text(self):
+        '입력 라벨의 값을 하나씩 지우는 메소드'
+        if not self.is_empty():
+            self.set_input(self.get_input()[:-1])
+
+    def set_result(self, text: str):
+        '결과 라벨의 값을 변경하는 메소드'
+        self.result_label.config(text=text)
+
+    def clear(self):
+        '모든 라벨의 값을 초기화'
+        self.set_input("")
+        self.set_result("")
+
+    def back(self, index=1):
+        '텍스트의 마지막 값을 리턴(pop과 유사)'
+        if len(self.get_input()) - index < 0:  # 만약 문자열 길이보다 뒤로 간다면
+            return ""  # 아무것도 출력 안함
+        return self.get_input()[-index]  # 텍스트의 마지막 출력
+
+    def is_num(self):
+        '텍스트의 마지막이 숫자인가?'
+        return self.back().isdigit()
+
+    def is_operator(self):
+        '텍스트의 마지막이 연산자인가?'
+        return self.back() in ('+', '-', '*', '/')
+
+    def is_bracket(self, option=None):
+        '텍스트의 마지막이 괄호인가? 옵션: 어느 괄호인지 선택'
+        t = self.back()
+        if option:  # 만약 옵션이 있다면
+            return t == option
+        return t in ('(', ')')  # 모든 괄호
+
+    def can_add_num(self):
+        '숫자가 추가 가능한가?'
+        # 조건: 마지막 숫자가 0이 아니거나 마지막에서 2번째가 숫자일 때
+        return self.back() != '0' or self.back(2).isdigit()
+
+    def can_add_operator(self):
+        '연산자가 추가 가능한가?'
+        # 조건: 마지막 문자가 숫자이거나 닫는 괄호일 경우
+        return self.is_num() or self.is_bracket(')')
+
+    def can_add_open_bracket(self):
+        '여는 괄호가 추가 가능한가?'
+        # 조건: 입력창이 비어있거나 연산자이거나 여는 괄호일 때
+        return self.is_empty() or self.is_operator() or self.is_bracket('(')
+
+    def can_add_close_bracket(self):
+        '닫는 괄호가 추가 가능한가?'
+        # 조건: 연산자가 추가 가능한 조건이거나, 여는 괄호의 수가 더 많을 때
+        text = self.get_input()
+        count = text.count('(') - text.count(')')
+        return self.can_add_operator() and count > 0
+
+    def calculation(self):
+        '입력받은 대로 계산'
+        text = self.get_input()
+        result = eval(text)  # 텍스트를 연산결과로 변경
+        self.clear()  # 먼저 초기화 해준 후에
+        self.set_result(f"{text} = {result}") # 결과창에 연산 결과 출력
+
+
+def add_number(text):
+    '숫자를 입력하는 함수'
+    if oper.can_add_num():
+        oper.add_text(text)
+
+
+def add_operator(text):
+    '연산자를 입력하는 함수'
+    if oper.can_add_operator():
+        oper.add_text(text)
+
+
+def add_open_bracket():
+    '여는 괄호를 입력하는 함수'
+    if oper.can_add_open_bracket():
+        oper.add_text('(')
+
+
+def add_close_bracket():
+    '닫는 괄호를 입력하는 함수'
+    if oper.can_add_close_bracket():
+        oper.add_text(')')
+
+
+# 창 기본설정
+app = Tk()
+app.title('계산기')
+app.minsize(width=350, height=500)  # 창의 최소크기를 350x500으로 지정
+
+# 입력 라벨
+input_label = Label(app, text="", font=FONT.format(20),
+                    background='#FFFFFF', height=2)
+input_label.pack(fill=BOTH)
+
+# 결과 라벨
+result_label = Label(app, text="", font=FONT.format(
+    15), background='#FFFFFF', height=2, borderwidth=1, relief='solid')
+result_label.pack(fill=BOTH)
+
+# 라벨들을 클래스 인스턴스로 등록
+oper = Operator(input_label, result_label)
+
+# 키패드 프레임
+frame = Frame(app)
+frame.pack()
+
+# 버튼은 frame영역에서 작업한다.
+for row in range(3):       # 행
+    for col in range(3):   # 열
+        cnt = row*3+col+1  # 행이 증가할 때마다 3을 증가시켜줌
+        btn = Button(frame, text=cnt, width=W, height=H, font=FONT.format(
+            20), command=lambda cnt=cnt: add_number(cnt))
+        btn.grid(row=row, column=col)
+btn0 = Button(frame, text="0", width=W, height=H,
+              font=FONT.format(20), command=lambda: add_number(0))
+btn0.grid(row=3, column=1)
+
+# 연산자 버튼들
+add_btn = Button(frame, text='+', width=W, height=H,
+                 font=FONT.format(20), command=lambda: add_operator('+'))
+add_btn.grid(row=0, column=3)
+sub_btn = Button(frame, text='-', width=W, height=H,
+                 font=FONT.format(20), command=lambda: add_operator('-'))
+sub_btn.grid(row=1, column=3)
+mul_btn = Button(frame, text='x', width=W, height=H,
+                 font=FONT.format(20), command=lambda: add_operator('*'))
+mul_btn.grid(row=2, column=3)
+div_btn = Button(frame, text='÷', width=W, height=H,
+                 font=FONT.format(20), command=lambda: add_operator('/'))
+div_btn.grid(row=3, column=3)
+
+# 괄호 버튼들
+open_btn = Button(frame, text='(', width=W, height=H,
+                  font=FONT.format(20), command=add_open_bracket)
+open_btn.grid(row=1, column=4)
+close_btn = Button(frame, text=')', width=W, height=H,
+                   font=FONT.format(20), command=add_close_bracket)
+close_btn.grid(row=2, column=4)
+
+# 제어 버튼들
+clr_btn = Button(frame, text='c', width=W, height=H,
+                 font=FONT.format(20), command=oper.clear)
+clr_btn.grid(row=0, column=4)
+res_btn = Button(frame, text='=', width=W, height=H,
+                 font=FONT.format(20), command=oper.calculation)
+res_btn.grid(row=3, column=0)
+del_btn = Button(frame, text='<', width=W, height=H,
+                 font=FONT.format(20), command=oper.del_text)
+del_btn.grid(row=3, column=2)
+
+app.mainloop()
+
