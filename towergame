@@ -1,0 +1,159 @@
+import random
+
+
+k_pow = 5
+e_pow = [0, 0]
+playing = True
+wave = 1
+mimicV = [0, 0]
+swordV = [0, 0]
+posionV = [0, 0]
+chestV = [0, 0]
+t = [0, 0]  # 0: mimic, 1: chest, 2: sword, 3: poison, 4: monster
+
+
+def set_mimic(tower):
+   mimicV[tower] = random.randint(1, wave + 1)
+
+
+def set_chest(tower):
+   chestV[tower] = random.randint(1, 5)
+
+
+def set_sword(tower):
+   swordV[tower] = random.randint(1, wave + 1)
+
+
+def set_poison(tower):
+   while True:
+       temp = random.randint(1, wave * 10)
+       if temp < k_pow:
+           posionV[tower] = temp
+           break
+
+
+def set_evil_power(tower):
+   while True:
+       temp = random.randint(1, wave * 10)
+       if temp <= k_pow:
+           e_pow[tower] = temp
+           break
+
+
+def play_event(tower):
+   global k_pow, playing
+   if t[tower] == 0:
+       k_pow //= mimicV[tower]
+   elif t[tower] == 1:
+       k_pow *= chestV[tower]
+   elif t[tower] == 2:
+       k_pow += swordV[tower]
+   elif t[tower] == 3:
+       k_pow -= posionV[tower]
+   else:
+       if k_pow > e_pow[tower]:
+           k_pow += e_pow[tower]
+       else:
+           print("GAME OVER.....")
+           input()
+           playing = False
+
+
+def play(choice):
+   play_event(choice - 1)
+
+
+def power(value, item_num):
+   if item_num == 0:
+       print(f"|   /{value:<4} |", end='')
+   elif item_num == 1:
+       print(f"|   x{value:<4} |", end='')
+   elif item_num == 2:
+       print(f"|   +{value:<4} |", end='')
+   elif item_num == 3:
+       print(f"|   -{value:<4} |", end='')
+   else:
+       print(f"|   {value:^6}|", end='')
+
+
+def print_player():
+   power(k_pow, 5)
+
+
+def mimic(): print("|   [(x)]  |", end='')
+def chest(): print("|   [(o)]  |", end='')
+def sword(): print("|   ---+   |", end='')
+def poison(): print("|  (xox)   |", end='')
+def knight(): print("|   i0[]   |", end='')
+def evil(): print("|   io[]   |", end='')
+
+
+def tower_head(): print("------------", end='')
+def tower_wall(): print("|          |", end='')
+def space(): print("            ", end='')
+def enter(): print()
+
+
+def print_mob(tower):
+   [mimic, chest, sword, poison, evil][t[tower]]()
+
+
+def print_value(tower):
+   value_list = [mimicV, chestV, swordV, posionV, e_pow]
+   power(value_list[t[tower]][tower], t[tower])
+
+
+def set_option(tower):
+   x = random.randint(1, 100)
+   if k_pow >= 10:
+       if x <= 24:
+           t[tower] = 0
+           set_mimic(tower)
+       elif x <= 29:
+           t[tower] = 1
+           set_chest(tower)
+       elif x <= 34:
+           t[tower] = 2
+           set_sword(tower)
+       elif x <= 60:
+           t[tower] = 3
+           set_poison(tower)
+       else:
+           t[tower] = 4
+           set_evil_power(tower)
+   else:
+       t[tower] = 4
+       set_evil_power(tower)
+
+
+def tower():
+   tower_head(); space(); space(); enter()
+   print_value(0); space(); space(); enter()
+   print_mob(0); space(); space(); enter()
+   tower_head(); space(); tower_head(); enter()
+   print_value(1); space(); print_player(); enter()
+   print_mob(1); space(); knight(); enter()
+
+
+def main():
+   global wave, playing
+   while playing:
+       set_option(0)
+       set_option(1)
+       print(f"wave: {wave}")
+       tower()
+       enter()
+       choice = input("UP:1, DOWN:2, end: OTHER >> ")
+       if choice == '1':
+           play(1)
+       elif choice == '2':
+           play(2)
+       else:
+           print("GAME IS END...")
+           input()
+           break
+       wave += 1
+
+
+if __name__ == "__main__":
+   main()
