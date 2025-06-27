@@ -1,0 +1,144 @@
+import sys
+import pygame
+from random import randint
+from pygame.locals import *
+
+pygame.init()
+
+# Settings
+GAMESIZE = 900
+GRID = 30
+W, H = GAMESIZE // GRID, GAMESIZE // GRID
+SURFACE = pygame.display.set_mode((GAMESIZE, GAMESIZE))
+pygame.display.set_caption("Two Player Snake Game")
+FPSCLOCK = pygame.time.Clock()
+
+# Fonts
+SMALLFONT = pygame.font.Font(None, 30)
+DESCFONT = pygame.font.Font(None, 50)
+TITLEFONT = pygame.font.Font(None, 80)
+
+FOODS = []
+
+class Snake:
+    def __init__(self, pos, color):
+        self.bodies = [pos]
+        self.color = color
+        self.direction = None
+        self.alive = True
+
+    def move(self):
+        if self.direction is None:
+            return
+
+        x, y = self.bodies[0]
+        if self.direction == K_LEFT:
+            x -= 1
+        elif self.direction == K_RIGHT:
+            x += 1
+        elif self.direction == K_UP:
+            y -= 1
+        elif self.direction == K_DOWN:
+            y += 1
+        head = (x, y)
+        if head in self.bodies or not (0 <= x < W) or not (0 <= y < H):
+            self.alive = False
+            return
+
+        self.bodies.insert(0, head)
+        if head in FOODS:
+            FOODS.remove(head)
+            add_food(self)
+        else:
+            self.bodies.pop()
+
+    def draw(self):
+        for x, y in self.bodies:
+            pygame.draw.rect(SURFACE, self.color, (x * GRID, y * GRID, GRID, GRID))
+
+    def head(self):
+        return self.bodies[0] if self.bodies else (-1, -1)
+
+def add_food(snake):
+    while True:
+        pos = (randint(0, W - 1), randint(0, H - 1))
+        if pos in FOODS or pos in snake.bodies:
+            continue
+        FOODS.append(pos)
+        break
+
+def paint(snakes, message):
+    SURFACE.fill((0, 0, 0))
+    for food in FOODS:
+        x, y = food
+        pygame.draw.ellipse(SURFACE, (0, 255, 0), (x * GRID, y * GRID, GRID, GRID))
+    for snake in snakes:
+        snake.draw()
+    for i in range(1, W):
+        pygame.draw.line(SURFACE, (64, 64, 64), (i * GRID, 0), (i * GRID, GAMESIZE))
+        pygame.draw.line(SURFACE, (64, 64, 64), (0, i * GRID), (GAMESIZE, i * GRID))
+    if message:
+        msg = TITLEFONT.render(message, True, (255, 255, 0))
+        msg_rect = msg.get_rect(center=(GAMESIZE // 2, GAMESIZE // 2))
+        SURFACE.blit(msg, msg_rect)
+    pygame.display.update()
+    FPSCLOCK.tick(7)
+
+def main():
+    red = Snake((int(W * 0.25), int(H / 2)), (255, 0, 0))
+    blue = Snake((int(W * 0.75), int(H / 2)), (0, 0, 255))
+    snakes = [red, blue]
+    controls = {
+        K_a: (red, K_LEFT), K_d: (red, K_RIGHT), K_w: (red, K_UP), K_s: (red, K_DOWN),
+        K_LEFT: (blue, K_LEFT), K_RIGHT: (blue, K_RIGHT), K_UP: (blue, K_UP), K_DOWN: (blue, K_DOWN)
+    }
+
+    for _ in range(15):
+        add_food(red)
+
+    winner_message = None
+    while True:
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type == KEYDOWN and event.key in controls:
+                snake, direction = controls[event.key]
+                snake.direction = direction
+
+        if not winner_message:
+            red.move()
+            blue.move()
+
+            # If both snakes collide at the same position
+            if red.head() == blue.head():
+                red.alive = False
+                blue.alive = False
+                if len(red.bodies) > len(blue.bodies):
+                    winner_message = "Red Snake is the Winner!"
+                elif len(blue.bodies) > len(red.bodies):
+                    winner_message = "Blue Snake is the Winner!"
+                else:
+                    winner_message = "It's a Tie!"
+
+            elif red.head() in blue.bodies:
+                red.alive = False
+            elif blue.head() in red.bodies:
+                blue.alive = False
+
+            if not red.alive and not blue.alive and winner_message is None:
+                if len(red.bodies) > len(blue.bodies):
+                    winner_message = "Red Snake is the Winner!"
+                elif len(blue.bodies) > len(red.bodies):
+                    winner_message = "Blue Snake is the Winner!"
+                else:
+                    winner_message = "It's a Tie!"
+            elif not red.alive and blue.alive:
+                winner_message = "Blue Snake is the Winner!"
+            elif not blue.alive and red.alive:
+                winner_message = "Red Snake is the Winner!"
+
+        paint(snakes, winner_message)
+
+if __name__ == '__main__':
+    main()
