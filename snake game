@@ -1,0 +1,137 @@
+import sys
+import pygame
+from random import randint
+from pygame.locals import QUIT, KEYDOWN, K_LEFT, K_RIGHT, K_UP, K_DOWN, Rect
+
+
+pygame.init()  # set pygame
+
+# basic setting
+GAMESIZE = 600  
+GRID = 30  
+
+pygame.display.set_caption("Snake Game") 
+SURFACE = pygame.display.set_mode((GAMESIZE, GAMESIZE))
+FPSCLOCK = pygame.time.Clock()
+
+# font
+SMALLFONT = pygame.font.Font(None, 30)  
+DESCFONT = pygame.font.Font(None, 50) 
+TITLEFONT = pygame.font.Font(None, 80) 
+
+(W, H) = (GAMESIZE//GRID, GAMESIZE//GRID)  # number of grid
+FOODS = []  
+
+
+class Snake:
+    """ Snake 객체 """
+    def __init__(self, pos):
+        self.bodies = [pos]  # set initial position of snake
+    def move(self, key):
+        """Snake 를 프레임만큼 이동 """
+        xpos, ypos = self.bodies[0]  # position of snake's head
+        if key == K_LEFT:  # left
+            xpos -= 1
+        elif key == K_RIGHT:  # right
+            xpos += 1
+        elif key == K_UP:  # up
+            ypos -= 1
+        elif key == K_DOWN:  # down
+            ypos += 1
+        head = (xpos, ypos)  # update head position
+        # Game over when head meets body or head goes off
+        is_game_over = head in self.bodies or \
+            not(0 <= xpos < W) or \
+            not(0 <= ypos < H)
+        self.bodies.insert(0, head) 
+
+        if head in FOODS:  # if head took food
+            i = FOODS.index(head)
+            del FOODS[i]  # eaten food disappears
+            add_food(self) 
+        else:
+            # did not eat food so is not being longer
+            self.bodies.pop()
+        return is_game_over  
+
+    def draw(self):
+        """draw Snake"""
+        for body in self.bodies:
+            x, y = body
+            pygame.draw.rect(SURFACE, (0, 255, 255), (x * GRID, y * GRID, GRID, GRID))
+def add_food(snake):
+    """Set food on random place"""
+    while True:
+        pos = (randint(0, W-1), randint(0, H-1)) 
+        if pos in FOODS or pos in snake.bodies:  
+            continue 
+        FOODS.append(pos)  
+        break  
+
+
+def paint(snake, texts, message, score):
+    """ 화면 전체 그리기 """
+    SURFACE.fill((0, 0, 0))  
+    for food in FOODS:  
+        fx, fy = food
+        pygame.draw.ellipse(SURFACE, (0, 255, 0),
+                            (fx * GRID, fy * GRID, GRID, GRID))
+
+    snake.draw()  # Draw Snake
+
+    for index in range(1, W):
+        line_pos = index * GRID
+        pygame.draw.line(SURFACE, (64, 64, 64),
+                         (line_pos, 0), (line_pos, GAMESIZE))  
+        pygame.draw.line(SURFACE, (64, 64, 64),
+                         (0, line_pos), (GAMESIZE, line_pos))  
+
+    if message != None and score != None:  
+        message_pos = message.get_rect() 
+        score_pos = score.get_rect() 
+
+        message_pos.centerx = GAMESIZE//2
+        message_pos.centery = GAMESIZE//2
+
+        score_pos.centerx = GAMESIZE//2
+        score_pos.top = message_pos.bottom 
+
+        SURFACE.blit(message, message_pos)  
+        SURFACE.blit(score, score_pos) 
+    SURFACE.blit(texts, (50, 50))  # present game score
+    pygame.display.update()  
+    FPSCLOCK.tick(5)  
+
+def main():
+    """ Main routine"""
+    key = K_DOWN  
+    message = None
+    score = None
+    game_over = False
+    snake = Snake((int(W/2), int(H/2))) 
+
+    for i in range(100):  # number of food is 5
+        add_food(snake)
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type == KEYDOWN:
+                key = event.key  
+
+        if game_over:  
+            message = TITLEFONT.render("Game Over!", True, (255, 255, 0))
+            score = DESCFONT.render(f"Score: {len(snake.bodies)-1}", True, (255, 0, 0)) 
+        else:
+            game_over = snake.move(key) 
+        texts = SMALLFONT.render(f"Score: {len(snake.bodies)-1}", True, (255, 0, 255))
+        paint(snake, texts, message, score)  
+
+
+if __name__ == '__main__':
+    main()
+
+
+
